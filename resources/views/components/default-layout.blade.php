@@ -1,27 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'Inventory AI' }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
-</head>
-<body class="bg-zinc-50 text-zinc-900">
-    <nav class="bg-zinc-900 text-white p-4 flex justify-between items-center shadow-lg">
-        <div class="flex items-center gap-2">
-            <i class="ph ph-package text-xl"></i>
-            <span class="font-bold tracking-tight">Smart Inventory</span>
-        </div>
-        <div class="flex gap-4 text-sm">
-            <a href="/dashboard" class="hover:text-blue-400">Dashboard</a>
-            <a href="/products" class="hover:text-blue-400">Products</a>
-            <a href="/profile" class="hover:text-blue-400">Profile</a>
-            <form action="/logout" method="POST">@csrf <button type="submit">Logout</button></form>
-        </div>
+<body class="bg-gray-100">
+    <nav class="bg-blue-600 p-4 text-white flex justify-between">
+        <span class="font-bold">Smart Inventory AI</span>
+        <span>{{ Auth::user()->name }} ({{ ucfirst(Auth::user()->role) }})</span>
     </nav>
-    <main class="p-8">
-        <h1 class="text-3xl font-bold mb-8">{{ $sectionTitle }}</h1>
-        {{ $slot }} </main>
+    <div class="flex">
+        <aside class="w-64 bg-white h-screen p-4 shadow">
+            <ul class="space-y-2">
+                <li><a href="/dashboard">Dashboard</a></li>
+                @if(Auth::user()->role == 'super_admin') <li><a href="/users">Manage Users</a></li> @endif
+                @if(Auth::user()->role == 'admin') <li><a href="/products">Manage Stok</a></li> @endif
+                @if(in_array(Auth::user()->role, ['admin', 'staff'])) <li><a href="/transactions">Transaksi</a></li> @endif
+                @if(Auth::user()->role == 'auditor') <li><a href="/logs">Audit Logs</a></li> @endif
+                @if(Auth::user()->role == 'supplier') <li><a href="/my-supply">Supply Saya</a></li> @endif
+            </ul>
+        </aside>
+        <main class="flex-1 p-6">{{ $slot }}</main>
+    </div>
 </body>
-</html>
