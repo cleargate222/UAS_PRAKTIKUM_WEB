@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
-    //
+    protected $fillable = ['product_id', 'user_id', 'type', 'quantity', 'note'];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
