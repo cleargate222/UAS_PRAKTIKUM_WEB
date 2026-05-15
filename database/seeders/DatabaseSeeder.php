@@ -2,24 +2,76 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Product;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // USERS
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        User::create([
+            'name' => 'Super Admin',
+            'email' => 'superadmin@test.com',
+            'password' => Hash::make('password'),
+            'role' => 'super_admin',
+        ]);
+
+        User::create([
+            'name' => 'Admin',
+            'email' => 'admin@test.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
+
+        User::create([
+            'name' => 'Staff',
+            'email' => 'staff@test.com',
+            'password' => Hash::make('password'),
+            'role' => 'staff',
+        ]);
+
+        User::create([
+            'name' => 'Auditor',
+            'email' => 'auditor@test.com',
+            'password' => Hash::make('password'),
+            'role' => 'auditor',
+        ]);
+
+        User::create([
+            'name' => 'Supplier',
+            'email' => 'supplier@test.com',
+            'password' => Hash::make('password'),
+            'role' => 'supplier',
+        ]);
+
+        // PRODUCTS
+
+        Product::create([
+            'name' => 'Laptop ASUS',
+            'stock' => 2,
+            'min_stock' => 10,
+            'description' => 'Laptop kantor',
+            'supplier_id' => 5,
+        ]);
+
+        Product::create([
+            'name' => 'Mouse Logitech',
+            'stock' => 50,
+            'min_stock' => 10,
+            'description' => 'Mouse wireless',
+            'supplier_id' => 5,
+        ]);
+
+        Product::create([
+            'name' => 'Kabel LAN',
+            'stock' => 0,
+            'min_stock' => 5,
+            'description' => 'Kabel jaringan',
+            'supplier_id' => 5,
         ]);
     }
 }
