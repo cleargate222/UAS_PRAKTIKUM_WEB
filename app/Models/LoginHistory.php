@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LoginHistory extends Model
 {
-    protected $fillable = ['user_id', 'ip_address', 'login_at'];
+    protected $fillable = ['user_id', 'ip_address', 'user_agent', 'login_at'];
 
     // Hubungkan login history dengan user
     public function user()

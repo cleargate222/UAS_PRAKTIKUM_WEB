@@ -17,6 +17,7 @@ return new class extends Migration
             ->constrained()
             ->onDelete('cascade');
             $table->ipAddress('ip_address')->nullable();
+            $table->string('user_agent')->nullable();
             $table->timestamp('login_at');
             $table->timestamps();
         });

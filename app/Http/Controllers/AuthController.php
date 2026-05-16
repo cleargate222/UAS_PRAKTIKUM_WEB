@@ -33,6 +33,7 @@ class AuthController extends Controller
             LoginHistory::create([
                 'user_id' => Auth::id(),      // ID siapa yang login
                 'ip_address' => $request->ip(), // Alamat IP perangkat
+                'user_agent' => $request->userAgent(), // <-- MENANGKAP DEVICE & BROWSER USER
                 'login_at' => now(),           // Jam saat ini
             ]);
 

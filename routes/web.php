@@ -12,7 +12,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplierController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // Halaman yang bisa diakses SEMUA role yang sudah login
@@ -28,7 +28,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 });
 
 // Khusus Admin & Staff (Manajemen Stok & Transaksi)
-Route::middleware(['auth', 'role:admin,staff'])->group(function () {
+Route::middleware(['auth', 'role:admin,staff,super_admin'])->group(function () {
     Route::resource('products', ProductController::class);
     Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
@@ -44,7 +44,7 @@ Route::middleware(['auth', 'role:auditor,super_admin'])->group(function () {
 
 // Khusus Supplier (Barang Milik Sendiri)
 Route::middleware(['auth', 'role:supplier'])->group(function () {
-    Route::get('/my-supply', [SupplierController::class, 'index']);
+    Route::get('/mySupply', [SupplierController::class, 'index'])->name('suppliers.index');
 });
 
 
@@ -52,3 +52,8 @@ Route::middleware(['auth', 'role:supplier'])->group(function () {
 Route::get('/login', [AuthController::class, 'index'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::middleware(['auth'])->group(function () {
+    // Pastikan route dashboard mengarah ke controller yang baru saja kamu update
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});

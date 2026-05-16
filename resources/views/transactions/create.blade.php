@@ -1,210 +1,51 @@
-@extends('layouts.app')
+<x-default-layout>
+    <div class="max-w-2xl bg-white p-6 rounded-lg shadow mx-auto">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">Input Transaksi Stok</h1>
 
-@section('content')
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">📦 Form Transaksi Barang</h4>
-                </div>
-                <div class="card-body">
-                    <!-- Tampilkan error jika ada -->
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>⚠️ Terjadi Kesalahan!</strong>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+        <form action="{{ route('transactions.store') }}" method="POST" class="space-y-4">
+            @csrf
+            <div>
+                <label class="block text-sm font-semibold text-gray-700">Pilih Produk</label>
+                <select name="product_id" class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-blue-500" required>
+                    <option value="">-- Pilih Produk --</option>
+                    @foreach($products as $product)
+                        <option value="{{ $product->id }}">{{ $product->name }} (Sisa Stok: {{ $product->stock }})</option>
+                    @endforeach
+                </select>
+            </div>
 
-                    <!-- Form Transaksi -->
-                    <form action="{{ route('transactions.store') }}" method="POST">
-                        @csrf
-
-                        <!-- Pilih Produk -->
-                        <div class="mb-3">
-                            <label for="product_id" class="form-label">
-                                <strong>📋 Pilih Produk</strong>
-                                <span class="text-danger">*</span>
-                            </label>
-                            <select
-                                class="form-select form-select-lg @error('product_id') is-invalid @enderror"
-                                id="product_id"
-                                name="product_id"
-                                required
-                                onchange="updateProductInfo()">
-                                <option value="">-- Pilih Produk --</option>
-                                @foreach ($products as $product)
-                                    <option
-                                        value="{{ $product->id }}"
-                                        data-stock="{{ $product->stock }}"
-                                        data-min-stock="{{ $product->min_stock }}"
-                                        data-supplier="{{ $product->supplier->name ?? 'N/A' }}"
-                                        {{ old('product_id') == $product->id ? 'selected' : '' }}>
-                                        {{ $product->name }} (Stok: {{ $product->stock }}) - Supplier: {{ $product->supplier->name ?? 'N/A' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('product_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Info Produk (Dinamis) -->
-                        <div id="productInfo" class="alert alert-info mb-3" style="display: none;">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <small><strong>Stok Saat Ini:</strong> <span id="currentStock">-</span> unit</small>
-                                </div>
-                                <div class="col-md-6">
-                                    <small><strong>Min Stok:</strong> <span id="minStock">-</span> unit</small>
-                                </div>
-                                <div class="col-md-6 mt-2">
-                                    <small><strong>Supplier:</strong> <span id="supplierName">-</span></small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tipe Transaksi -->
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <strong>📥 Tipe Transaksi</strong>
-                                <span class="text-danger">*</span>
-                            </label>
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="type"
-                                        id="typeIn"
-                                        value="in"
-                                        {{ old('type') == 'in' ? 'checked' : '' }}
-                                        required>
-                                    <label class="form-check-label" for="typeIn">
-                                        ✅ <strong>Barang Masuk</strong> (Tambah Stok)
-                                    </label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="type"
-                                        id="typeOut"
-                                        value="out"
-                                        {{ old('type') == 'out' ? 'checked' : '' }}
-                                        required>
-                                    <label class="form-check-label" for="typeOut">
-                                        ❌ <strong>Barang Keluar</strong> (Kurangi Stok)
-                                    </label>
-                                </div>
-                            </div>
-                            @error('type')
-                                <div class="text-danger small mt-2">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Jumlah Barang -->
-                        <div class="mb-3">
-                            <label for="quantity" class="form-label">
-                                <strong>🔢 Jumlah Barang</strong>
-                                <span class="text-danger">*</span>
-                            </label>
-                            <input
-                                type="number"
-                                class="form-control form-control-lg @error('quantity') is-invalid @enderror"
-                                id="quantity"
-                                name="quantity"
-                                placeholder="Masukkan jumlah barang"
-                                min="1"
-                                value="{{ old('quantity') }}"
-                                required>
-                            @error('quantity')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Catatan (Opsional) -->
-                        <div class="mb-3">
-                            <label for="note" class="form-label">
-                                <strong>📝 Catatan</strong> (Opsional)
-                            </label>
-                            <textarea
-                                class="form-control @error('note') is-invalid @enderror"
-                                id="note"
-                                name="note"
-                                rows="3"
-                                placeholder="Contoh: Pembelian dari supplier ABC / Persiapan untuk acara... (maksimal 500 karakter)"
-                                maxlength="500">{{ old('note') }}</textarea>
-                            <small class="form-text text-muted">
-                                <span id="charCount">0</span>/500 karakter
-                            </small>
-                            @error('note')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Button Submit -->
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{{ route('transactions.index') }}" class="btn btn-secondary btn-lg">
-                                🔙 Batal
-                            </a>
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                💾 Simpan Transaksi
-                            </button>
-                        </div>
-                    </form>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700">Jenis Transaksi</label>
+                <div class="mt-2 flex space-x-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="type" value="in" class="text-blue-600" checked>
+                        <span class="ml-2 text-sm font-medium text-gray-700">Barang Masuk (Stok Bertambah)</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="type" value="out" class="text-blue-600">
+                        <span class="ml-2 text-sm font-medium text-gray-700">Barang Keluar (Stok Berkurang)</span>
+                    </label>
                 </div>
             </div>
 
-            <!-- Informasi Panduan -->
-            <div class="card mt-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">ℹ️ Panduan Penggunaan</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="mb-0">
-                        <li>Pilih produk dari dropdown yang tersedia</li>
-                        <li>Pilih tipe transaksi: <strong>Barang Masuk</strong> untuk menambah stok atau <strong>Barang Keluar</strong> untuk mengurangi stok</li>
-                        <li>Masukkan jumlah barang yang akan ditransaksikan</li>
-                        <li>Isi catatan untuk informasi tambahan (opsional)</li>
-                        <li>Klik "Simpan Transaksi" untuk menyimpan data</li>
-                        <li>Semua transaksi akan tercatat otomatis di audit log</li>
-                    </ul>
-                </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700">Jumlah Perubahan (Qty)</label>
+                <input type="number" name="quantity" min="1" class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-blue-500" required>
+                @error('quantity')
+                    <span class="text-red-500 text-xs mt-1 block font-semibold">{{ $message }}</span>
+                @enderror
             </div>
-        </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700">Catatan Tambahan</label>
+                <input type="text" name="note" placeholder="Misal: Restock dari Supplier A / Retur barang rusak" class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2">
+                <button type="submit" class="w-full bg-blue-600 text-white p-2.5 rounded font-bold hover:bg-blue-700 transition cursor-pointer">
+                    Simpan & Update Stok
+                </button>
+            </div>
+        </form>
     </div>
-</div>
-
-<script>
-    // Update informasi produk saat dropdown berubah
-    function updateProductInfo() {
-        const select = document.getElementById('product_id');
-        const selectedOption = select.options[select.selectedIndex];
-        const productInfo = document.getElementById('productInfo');
-
-        if (selectedOption.value) {
-            document.getElementById('currentStock').textContent = selectedOption.getAttribute('data-stock');
-            document.getElementById('minStock').textContent = selectedOption.getAttribute('data-min-stock');
-            document.getElementById('supplierName').textContent = selectedOption.getAttribute('data-supplier');
-            productInfo.style.display = 'block';
-        } else {
-            productInfo.style.display = 'none';
-        }
-    }
-
-    // Hitung jumlah karakter di textarea catatan
-    document.getElementById('note').addEventListener('input', function() {
-        document.getElementById('charCount').textContent = this.value.length;
-    });
-
-    // Panggil updateProductInfo saat halaman dimuat
-    window.addEventListener('load', updateProductInfo);
-</script>
-@endsection
+</x-default-layout>

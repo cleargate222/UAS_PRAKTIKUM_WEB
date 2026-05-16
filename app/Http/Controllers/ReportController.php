@@ -30,7 +30,6 @@ class ReportController extends Controller
         // Transaksi terbaru
         $recentTransactions = Transaction::with('product', 'user')
             ->latest()
-            ->limit(10)
             ->get();
 
         return view('reports.index', compact(

@@ -1,169 +1,48 @@
-@extends('layouts.app')
+<x-default-layout>
+    <div class="space-y-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">Riwayat Transaksi</h1>
+            <a href="{{ route('transactions.create') }}" class="bg-blue-600 text-white text-sm px-4 py-2 rounded shadow font-semibold">
+                + Input Transaksi Baru
+            </a>
+        </div>
 
-@section('content')
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-12">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>📊 Riwayat Transaksi</h2>
-                <a href="{{ route('transactions.create') }}" class="btn btn-primary btn-lg">
-                    ➕ Tambah Transaksi Baru
-                </a>
-            </div>
-
-            <!-- Alert Sukses -->
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>✅ Berhasil!</strong> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            <!-- Tabel Transaksi -->
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">📋 Daftar Semua Transaksi</h5>
-                </div>
-                <div class="table-responsive">
-                    @if ($transactions->count() > 0)
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 8%">No</th>
-                                    <th style="width: 20%">Produk</th>
-                                    <th style="width: 12%">Tipe</th>
-                                    <th style="width: 12%">Jumlah</th>
-                                    <th style="width: 18%">Staff</th>
-                                    <th style="width: 20%">Tanggal</th>
-                                    <th style="width: 10%">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($transactions as $index => $transaction)
-                                    <tr>
-                                        <td>
-                                            <strong>{{ ($transactions->currentPage() - 1) * $transactions->perPage() + $loop->iteration }}</strong>
-                                        </td>
-                                        <td>
-                                            <strong>{{ $transaction->product->name }}</strong><br>
-                                            <small class="text-muted">Supplier: {{ $transaction->product->supplier->name ?? 'N/A' }}</small>
-                                        </td>
-                                        <td>
-                                            @if ($transaction->type === 'in')
-                                                <span class="badge bg-success">✅ Masuk</span>
-                                            @else
-                                                <span class="badge bg-danger">❌ Keluar</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <strong>{{ $transaction->quantity }}</strong> unit
-                                        </td>
-                                        <td>
-                                            <small>{{ $transaction->user->name ?? 'N/A' }}</small><br>
-                                            <small class="text-muted">({{ $transaction->user->email ?? '' }})</small>
-                                        </td>
-                                        <td>
-                                            <small>{{ $transaction->created_at->format('d M Y H:i') }}</small><br>
-                                            <small class="text-muted">{{ $transaction->created_at->diffForHumans() }}</small>
-                                        </td>
-                                        <td>
-                                            <a href="{{ route('transactions.show', $transaction->id) }}" class="btn btn-sm btn-info">
-                                                👁️ Lihat
-                                            </a>
-                                        </td>
-                                    </tr>
-
-                                    <!-- Baris Catatan (jika ada) -->
-                                    @if (!empty($transaction->note))
-                                        <tr class="table-light">
-                                            <td colspan="7">
-                                                <small>
-                                                    <strong>Catatan:</strong> <em>{{ $transaction->note }}</em>
-                                                </small>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center py-4">
-                                            <h5 class="text-muted">📭 Belum ada transaksi</h5>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    @else
-                        <div class="alert alert-info m-4">
-                            <h5>📭 Belum ada data transaksi</h5>
-                            <p>Mulai dengan membuat transaksi baru dengan mengklik tombol "Tambah Transaksi Baru"</p>
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Pagination -->
-                @if ($transactions->count() > 0)
-                    <div class="card-footer bg-light">
-                        {{ $transactions->links() }}
-                    </div>
-                @endif
-            </div>
-
-            <!-- Statistik Transaksi -->
-            <div class="row mt-4">
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title">Total Transaksi</h5>
-                            <h2 class="text-primary">{{ $transactions->total() }}</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title">Barang Masuk (Hari ini)</h5>
-                            <h2 class="text-success">
-                                @php
-                                    $today_in = \App\Models\Transaction::where('type', 'in')
-                                        ->whereDate('created_at', today())
-                                        ->sum('quantity');
-                                @endphp
-                                {{ $today_in }}
-                            </h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title">Barang Keluar (Hari ini)</h5>
-                            <h2 class="text-danger">
-                                @php
-                                    $today_out = \App\Models\Transaction::where('type', 'out')
-                                        ->whereDate('created_at', today())
-                                        ->sum('quantity');
-                                @endphp
-                                {{ $today_out }}
-                            </h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title">Net (Hari ini)</h5>
-                            <h2 class="text-info">
-                                @php
-                                    $net = $today_in - $today_out;
-                                @endphp
-                                {{ $net > 0 ? '+' : '' }}{{ $net }}
-                            </h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+            <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                    <tr class="bg-gray-50 border-b text-gray-600 font-bold uppercase tracking-wider">
+                        <th class="p-4">Waktu</th>
+                        <th class="p-4">Produk</th>
+                        <th class="p-4">Jenis</th>
+                        <th class="p-4">Qty</th>
+                        <th class="p-4">Petugas</th>
+                        <th class="p-4 text-center">Detail</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700 divide-y divide-gray-100">
+                    @foreach($transactions as $tx)
+                    <tr class="hover:bg-gray-50/50 transition">
+                        <td class="p-4 text-gray-500">{{ $tx->created_at->format('d M Y H:i') }}</td>
+                        <td class="p-4 font-semibold text-gray-900">{{ $tx->product->name }}</td>
+                        <td class="p-4">
+                            <span class="px-2 py-0.5 text-xs font-bold rounded-full {{ $tx->type == 'in' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                {{ $tx->type == 'in' ? 'MASUK' : 'KELUAR' }}
+                            </span>
+                        </td>
+                        <td class="p-4 font-mono font-bold">{{ $tx->quantity }}</td>
+                        <td class="p-4 text-gray-600">{{ $tx->user->name }}</td>
+                        <td class="p-4 text-center">
+                            <a href="{{ route('transactions.show', $tx->id) }}" class="inline-flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-blue-600 hover:text-blue-800 font-bold text-xs px-2.5 py-1.5 rounded transition shadow-sm cursor-pointer">
+                                👁️
+                            </a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-4">
+            {{ $transactions->links() }}
         </div>
     </div>
-</div>
-@endsection
+</x-default-layout>
