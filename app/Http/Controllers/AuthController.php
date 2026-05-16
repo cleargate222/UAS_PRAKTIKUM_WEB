@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LoginHistory;
+use App\Helpers\AuditHelper;
 
 class AuthController extends Controller
 {
@@ -35,6 +36,10 @@ class AuthController extends Controller
                 'login_at' => now(),           // Jam saat ini
             ]);
 
+            // Catat aktivitas login ke audit log
+            $user = Auth::user();
+            AuditHelper::logLogin($user);
+
             // Arahkan ke dashboard
             return redirect()->intended('/dashboard');
         }
@@ -48,6 +53,12 @@ class AuthController extends Controller
     // Memproses Logout
     public function logout(Request $request)
     {
+        // Simpan data user sebelum logout
+        $user = Auth::user();
+
+        // Catat aktivitas logout ke audit log
+        AuditHelper::logLogout($user);
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
