@@ -90,13 +90,13 @@ class DashboardController extends Controller
             return "Belum ada data produk atau transaksi di dalam database untuk dianalisis.";
         }
 
-        // 1. Mengubah data produk menjadi string teks (Sesuai Modul VII)
+        // 1. Mengubah data produk menjadi string teks
         $dataProdukTeks = $products->map(function ($item) {
             $namaSupplier = isset($item->supplier) ? $item->supplier->name : 'Tanpa Supplier';
             return "Barang: {$item->name} (Stok: {$item->stock}/Min: {$item->min_stock}, Supplier: {$namaSupplier})";
         })->implode(', ');
 
-        // 2. PERBAIKAN: Mengubah data aktivitas transaksi keluar-masuk menjadi string teks untuk dibaca AI
+        // 2. Mengubah data aktivitas transaksi keluar-masuk menjadi string teks untuk dibaca AI
         $dataTransaksiTeks = $transactions->map(function ($tx) {
             $namaBarang = $tx->product ? $tx->product->name : 'Produk Dihapus';
             $tipe = $tx->type == 'in' ? 'Masuk (+)' : 'Keluar (-)';

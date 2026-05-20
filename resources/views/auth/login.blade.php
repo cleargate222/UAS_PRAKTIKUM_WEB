@@ -4,100 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AnoInventory</title>
-    <!-- Tailwind CSS v4 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Custom gradient warna dari gambar banner Anda */
+        .bg-gradient-banner {
+            background: linear-gradient(135deg, #312ecb 0%, #3b28b5 40%, #612199 100%);
+        }
+        /* Warna background gelap luar sesuai gambar kedua */
+        .bg-dark-page {
+            background-color: #1e1e26;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased flex items-center justify-center min-h-screen p-4">
+<body class="bg-dark-page text-slate-100 antialiased min-h-screen flex flex-col md:flex-row">
 
-    <div class="w-full max-w-[400px] space-y-8">
+    <div class="hidden md:flex md:w-[45%] bg-gradient-banner p-12 flex-col justify-between text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-white/5 opacity-20 pointer-events-none"></div>
 
-        <!-- Header / Identitas Brand -->
-        <div class="space-y-2">
-            <!-- Simbol Box Minimalis -->
-            <div class="inline-flex items-center justify-center w-10 h-10 bg-indigo-600 rounded-xl text-white font-black text-lg shadow-md shadow-indigo-600/10">
-                A
-            </div>
-            <h1 class="text-2xl font-black tracking-tight text-slate-900 mt-4">
-                Masuk ke AnoInventory
-            </h1>
-            <p class="text-sm text-slate-500">
-                Kelola inventaris, stok gudang, dan pasokan logistik dalam satu dasbor terpadu.
-            </p>
+        <div class="flex items-center gap-2 text-xl font-black tracking-tight relative z-10">
+            <div class="w-8 h-8 bg-white text-[#312ecb] flex items-center justify-center rounded-lg font-black shadow-lg">A</div>
+            AnoInventory
         </div>
+        <div class="relative z-10">
+            <h2 class="text-5xl font-extrabold leading-tight mb-6 tracking-tight">Kelola Logistik<br>Lebih Cerdas.</h2>
+            <p class="text-white/80 max-w-sm text-sm leading-relaxed">Pantau stok, arus barang, dan data operasional gudang Anda dalam satu dasbor yang intuitif.</p>
+        </div>
+        <p class="text-xs text-white/40 relative z-10">&copy; {{ date('Y') }} AnoInventory</p>
+    </div>
 
-        <!-- Card Login -->
-        <div class="bg-white border border-slate-200/60 rounded-2xl p-6 md:p-8 shadow-xs shadow-slate-100/80">
-            <form action="{{ route('login') }}" method="POST" class="space-y-5">
+    <div class="flex-1 flex items-center justify-center p-8 bg-dark-page">
+        <div class="w-full max-w-[380px]">
+
+            <div class="mb-10 text-left">
+                <div class="md:hidden w-12 h-12 bg-gradient-banner rounded-xl flex items-center justify-center text-white text-xl font-black mb-8 shadow-xl shadow-indigo-900/50">A</div>
+                <h1 class="text-3xl font-black tracking-tight text-white mb-3">Selamat Datang</h1>
+                <p class="text-slate-400 text-sm font-medium">Masukkan kredensial Anda untuk masuk ke sistem.</p>
+            </div>
+
+            <form action="{{ route('login') }}" method="POST" class="space-y-6">
                 @csrf
 
-                <!-- Kolom Email -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                        Alamat Email
-                    </label>
-                    <input
-                        type="email"
-                        name="email"
-                        value="{{ old('email') }}"
-                        placeholder="nama@perusahaan.com"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all duration-200 @error('email') border-rose-300 focus:ring-rose-500 @enderror"
-                        required
-                        autofocus
-                    >
-                    @error('email')
-                        <span class="text-rose-600 text-xs font-medium mt-1 block">
-                            {{ $message }}
-                        </span>
-                    @enderror
-                </div>
-
-                <!-- Kolom Password -->
-                <div class="space-y-1.5">
-                    <div class="flex justify-between items-center">
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                            Kata Sandi
-                        </label>
-                    </div>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="••••••••"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all duration-200"
-                        required
-                    >
-                </div>
-
-                <!-- Remember Me Checkbox -->
-                <div class="flex items-center pt-0.5">
-                    <label class="flex items-center gap-2 cursor-pointer group select-none">
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Alamat Email</label>
                         <input
-                            type="checkbox"
-                            name="remember"
-                            class="w-4 h-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-600 accent-indigo-600 cursor-pointer"
+                            type="email"
+                            name="email"
+                            placeholder="nama@perusahaan.com"
+                            class="w-full bg-transparent border-b-2 border-slate-700 focus:border-[#312ecb] outline-hidden py-3 text-sm font-semibold text-white transition-colors placeholder:text-slate-600"
+                            required
                         >
-                        <span class="text-xs text-slate-500 group-hover:text-slate-700 transition-colors font-medium">
-                            Ingat sesi masuk saya
-                        </span>
-                    </label>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kata Sandi</label>
+                            <a href="#" class="text-xs font-bold text-[#4c49f5] hover:text-[#612199] transition-colors">Lupa?</a>
+                        </div>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="••••••••"
+                            class="w-full bg-transparent border-b-2 border-slate-700 focus:border-[#312ecb] outline-hidden py-3 text-sm font-semibold text-white transition-colors placeholder:text-slate-600"
+                            required
+                        >
+                    </div>
                 </div>
 
-                <!-- Tombol Submit -->
                 <button
                     type="submit"
-                    class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl text-sm shadow-xs transition-all duration-150 cursor-pointer flex items-center justify-center gap-2 mt-2"
+                    class="w-full bg-gradient-banner hover:opacity-95 text-white font-bold py-4 rounded-xl text-sm transition-all active:scale-[0.98] mt-4 shadow-xl shadow-indigo-950/50 cursor-pointer"
                 >
-                    Sign In
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                    </svg>
+                    Masuk
                 </button>
             </form>
-        </div>
 
-        <!-- Footer Hak Cipta -->
-        <p class="text-center text-xs text-slate-400 font-medium">
-            &copy; {{ date('Y') }} AnoInventory. Hak Cipta Dilindungi.
-        </p>
+            <p class="mt-8 text-center text-xs text-slate-500 md:hidden font-medium">
+                &copy; {{ date('Y') }} AnoInventory. All Rights Reserved.
+            </p>
+        </div>
     </div>
 
 </body>
